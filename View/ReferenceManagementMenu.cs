@@ -12,50 +12,53 @@ namespace HongHeng.UnityReferenceTracker {
 
         private static readonly FileReferenceTracker Tracker = new FileReferenceTracker();
 
-        [MenuItem("Assets/- FindMissingReferenceFiles", false, 31)]
+        [MenuItem("Tools/ReferenceTracker/FindMissingReferenceFiles (not mat)", false, 1)]
         public static void FindMissingReferenceFiles() {
-            var fileRefs = AssetDatabase.GetAllAssetPaths()
-                .Where(path => path.StartsWith("Assets" + Path.DirectorySeparatorChar))
-                .Where(File.Exists)
-                .Select(MissingReferenceTracker.FindMissingReferenceFiles)
-                .Where(file => file != null)
-                .ToArray();
-            Debug.Log($"====\nFindMissingReferenceFiles.");
-            DebugLog(fileRefs);
-            Debug.Log($"FindMissingReferenceFiles. result = {fileRefs.Length}");
+            CountTime(() => FindAndLogMissingReferenceFiles(path => !path.EndsWith(".mat")));
         }
 
-        [MenuItem("Assets/- FindReferences", false, 32)]
-        public static void FindReferences() {
-            CountTime(() => FindReferences(Selection.activeObject));
-        }
-
-        [MenuItem("Assets/- FindUselessFiles (all)", false, 33)]
+        [MenuItem("Tools/ReferenceTracker/FindUselessFiles (all)", false, 101)]
         public static void FindAllUselessFile() {
             CountTime(() => FindUselessFile());
         }
 
-        [MenuItem("Assets/- FindUselessFiles (code)", false, 34)]
+        [MenuItem("Tools/ReferenceTracker/FindUselessFiles (code)", false, 102)]
         public static void FindUselessCodeFile() {
             CountTime(() => FindUselessFile(path => path.EndsWith(".cs")));
         }
 
-        [MenuItem("Assets/- FindUselessFiles (not code)", false, 35)]
+        [MenuItem("Tools/ReferenceTracker/FindUselessFiles (not code)", false, 103)]
         public static void FindUselessResourceFile() {
             CountTime(() => FindUselessFile(path => !path.EndsWith(".cs")));
         }
 
-        [MenuItem("Assets/- FindUselessFiles (prefab)", false, 36)]
+        [MenuItem("Tools/ReferenceTracker/FindUselessFiles (prefab)", false, 104)]
         public static void FindUselessPrefabFile() {
             CountTime(() => FindUselessFile(path => path.EndsWith(".prefab")));
         }
 
-        private static void CountTime(Action action) {
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            action();
-            sw.Stop();
-            Debug.Log($"Time cost: {sw.ElapsedMilliseconds} ms");
+        [MenuItem("Tools/ReferenceTracker/FindReferences (Selection)", false, 202)]
+        [MenuItem("Assets/- FindReferences", false, 39)]
+        public static void FindReferences() {
+            CountTime(() => FindReferences(Selection.activeObject));
+        }
+
+        public static IEnumerable<ReferenceFile> GetMissingReferenceFiles(
+            Func<string, bool> filter = null) {
+            filter = filter ?? (path => true);
+            return AssetDatabase.GetAllAssetPaths()
+                .Where(path => path.StartsWith("Assets" + Path.DirectorySeparatorChar))
+                .Where(File.Exists)
+                .Where(filter)
+                .Select(MissingReferenceTracker.FindMissingReferenceFiles)
+                .Where(file => file != null);
+        }
+
+        private static void FindAndLogMissingReferenceFiles(Func<string, bool> filter = null) {
+            var fileRefs = GetMissingReferenceFiles(filter).ToArray();
+            Debug.Log($"====\nFindMissingReferenceFiles.");
+            DebugLog(fileRefs);
+            Debug.Log($"FindMissingReferenceFiles. result = {fileRefs.Length}");
         }
 
         private static void FindReferences(Object obj) {
@@ -113,6 +116,14 @@ namespace HongHeng.UnityReferenceTracker {
         private static bool NeedReference(string path) {
             return !path.Split(Path.DirectorySeparatorChar)
                 .Any(IgnoredDirectory.Contains);
+        }
+
+        private static void CountTime(Action action) {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            action();
+            sw.Stop();
+            Debug.Log($"Time cost: {sw.ElapsedMilliseconds} ms");
         }
 
     }

@@ -43,9 +43,6 @@ namespace HongHeng.UnityReferenceTracker {
                         : GetReferenceObject(t, filter))
                     .Where(refObj => refObj != null)
                     .ToArray();
-                if (!(obj is MonoScript) && !(obj is ScriptableObject) && !(obj is DefaultAsset)) {
-                    Debug.LogError($"Unexpect object type {obj.GetType()} in: {path}");
-                }
             }
             return referenceObjects?.Length > 0
                 ? new ReferenceFile {
