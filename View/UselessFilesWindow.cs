@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -6,9 +5,12 @@ using UnityEngine;
 
 namespace HongHeng.UnityReferenceTracker {
 
-    internal class UselessFilesWindow : EditorWindow {
+    public class UselessFilesWindow : EditorWindow {
 
         internal static void Create(string[] uselessFiles) {
+            if (uselessFiles.Length == 0) {
+                return;
+            }
             CreateInstance<UselessFilesWindow>()
                 .SetData(uselessFiles)
                 .Show();

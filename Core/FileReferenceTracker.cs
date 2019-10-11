@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
-namespace HongHeng.UnityReferenceTracker {
+namespace HongHeng.UnityReferenceTracker.Core {
 
     public class FileReferenceTracker {
 

@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace HongHeng.UnityReferenceTracker {
+namespace HongHeng.UnityReferenceTracker.Core {
 
     public delegate bool PropertyFilter(SerializedProperty serializedProperty);
 

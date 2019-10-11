@@ -1,7 +1,7 @@
 using System.Reflection;
 using UnityEditor;
 
-namespace HongHeng.UnityReferenceTracker {
+namespace HongHeng.UnityReferenceTracker.Core {
 
     public static class MissingReferenceTracker {
 

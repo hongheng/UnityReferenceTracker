@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace HongHeng.UnityReferenceTracker {
+namespace HongHeng.UnityReferenceTracker.Core {
 
     public static class UnityApi {
 
