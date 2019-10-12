@@ -3,11 +3,11 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace HongHeng.UnityReferenceTracker {
+namespace HongHeng.UnityReferenceTracker.View {
 
     public class UselessFilesWindow : EditorWindow {
 
-        internal static void Create(string[] uselessFiles) {
+        public static void Create(string[] uselessFiles) {
             if (uselessFiles.Length == 0) {
                 return;
             }

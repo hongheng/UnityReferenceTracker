@@ -62,6 +62,7 @@ namespace HongHeng.UnityReferenceTracker.View {
                 .ToArray();
             return AssetDatabase.FindAssets("", selection)
                 .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(filter)
                 .Where(path => !path.Split(Path.DirectorySeparatorChar)
                     .Any(IgnoredDirectory.Contains));
         }

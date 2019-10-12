@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HongHeng.UnityReferenceTracker.Core;
+using HongHeng.UnityReferenceTracker.View;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -28,6 +29,7 @@ namespace HongHeng.UnityReferenceTracker {
                 .Where(File.Exists)
                 .Select(MissingReferenceTracker.FindMissingReferenceFiles)
                 .Where(file => file != null)
+                .OrderBy(f => f.ReferenceFilePath)
                 .ToArray();
         }
 
@@ -35,26 +37,29 @@ namespace HongHeng.UnityReferenceTracker {
 
         #region Useless File
 
-        public static string[] LogUselessFiles(IEnumerable<string> filePaths) {
+        public static string[] LogUselessFiles(IEnumerable<string> filePaths, bool showWindow = false) {
             Debug.Log($"====\nFindUselessFile.");
             var uselessFiles = CountTime(() => GetUselessFiles(filePaths));
-            if (uselessFiles.Length > 0) {
-                foreach (var filePath in uselessFiles) {
-                    Debug.Log($"\t{filePath}", AssetDatabase.LoadAssetAtPath<Object>(filePath));
-                }
+            foreach (var filePath in uselessFiles) {
+                Debug.Log($"\t{filePath}", AssetDatabase.LoadAssetAtPath<Object>(filePath));
             }
             Debug.Log($"FindUselessFile. Find {uselessFiles.Length} files.");
+            if (showWindow) {
+                UselessFilesWindow.Create(uselessFiles);
+            }
             return uselessFiles;
         }
 
         public static string[] GetUselessFiles(IEnumerable<string> filePaths) {
             var selectObjects = filePaths
+                .Where(f => !UnityApi.IsSceneFile(f))
                 .Where(File.Exists)
                 .Select(AssetDatabase.LoadAssetAtPath<Object>)
                 .ToArray();
             return selectObjects
                 .Where(obj => !Tracker.FindReferences(obj).Any())
                 .Select(AssetDatabase.GetAssetPath)
+                .OrderBy(f => f)
                 .ToArray();
         }
 
@@ -72,7 +77,9 @@ namespace HongHeng.UnityReferenceTracker {
         }
 
         public static ReferenceFile[] GetReferences(Object obj) {
-            return Tracker.FindReferences(obj).ToArray();
+            return Tracker.FindReferences(obj)
+                .OrderBy(fr => fr.ReferenceFilePath)
+                .ToArray();
         }
 
         #endregion
@@ -80,7 +87,7 @@ namespace HongHeng.UnityReferenceTracker {
         #region Tool
 
         private static void DebugLog(IEnumerable<ReferenceFile> fileRefs) {
-            foreach (var fileRef in fileRefs.OrderBy(fr => fr.ReferenceFilePath)) {
+            foreach (var fileRef in fileRefs) {
                 var filePath = fileRef.ReferenceFilePath;
                 Debug.Log($"\t{filePath}", AssetDatabase.LoadAssetAtPath<Object>(filePath));
                 foreach (var refRes in fileRef.ReferenceObjects) {
